@@ -41,6 +41,7 @@ func AwaitAnswer() -> Bool
     if let unwrappedAnswer = answer
     {
         //FIXME: if you insert a 4-letter sequence of letters it doesnt stop, wooooops
+        //FIXME: don't let the player type a character more than once
         if unwrappedAnswer.count == 4 && !unwrappedAnswer.contains("9") && !unwrappedAnswer.contains("0") 
         {
             tries+=1
