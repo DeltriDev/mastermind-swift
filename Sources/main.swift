@@ -20,6 +20,7 @@ repeat
 //game loop
 repeat
 {
+    print("Try \(tries+1)")
     if AwaitAnswer()
     {
         print("You broke the code! Congratulations!") //add how many tries it took
