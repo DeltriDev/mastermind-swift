@@ -1,39 +1,55 @@
-//intro to the game
-print("Welcome to the code-breaking game MasterMind, written in Swift!")
-print("Try to guess the number sequence of numbers from 1-8!")
-print("Every number can be used once")
-print("You have 12 tries")
 //necessary variables
 var tries = 0
-let possibleCharacters:[String] = ["1","2","3","4","5","6","7","8"]
-let possibleCharactersString = "12345678"
-var correctAnswer:String = ""
-//generate the correct answer
-repeat
+let possibleCharacters:Set<String.Element> = ["1","2","3","4","5","6","7","8"]
+var correctAnswer:String = GenerateCorrectAnswer()
+
+//run the game
+GameLoop()
+
+func GameLoop()
 {
-    let charToAdd = possibleCharacters[Int.random(in: 0...7)]
-    if !correctAnswer.contains(charToAdd)
+    GameIntro()
+    repeat
     {
-        correctAnswer += charToAdd
-    }
-}while correctAnswer.count < 4
-//game loop
-repeat
+        print("Try \(tries+1)")
+        if AwaitAnswer()
+        {
+            print("You broke the code! Congratulations!") //add how many tries it took
+            readLine()
+            break
+        }
+        else if tries == 12
+        {
+            print("You lost...")
+            readLine()
+            break
+        }
+    }while tries<12
+}
+
+//explain the rules to the player
+func GameIntro()
 {
-    print("Try \(tries+1)")
-    if AwaitAnswer()
+    print("Welcome to the code-breaking game MasterMind, written in Swift!")
+    print("Try to guess the number sequence of numbers from 1-8!")
+    print("Every number can be used once")
+    print("You have 12 tries")
+}
+
+//returns a 4 letter string made with elements from possibleCharacters
+func GenerateCorrectAnswer() -> String
+{
+    var correctAnswer = ""
+    repeat
     {
-        print("You broke the code! Congratulations!") //add how many tries it took
-        readLine()
-        break
-    }
-    else if tries == 12
-    {
-        print("You lost...")
-        readLine()
-        break
-    }
-}while tries<12
+        let charToAdd = possibleCharacters.randomElement()!
+        if !correctAnswer.contains(charToAdd)
+        {
+            correctAnswer += String(charToAdd)
+        }
+    }while correctAnswer.count < 4
+    return correctAnswer
+}
 
 //asks for an answer and returns true if its correct
 func AwaitAnswer() -> Bool
@@ -42,13 +58,8 @@ func AwaitAnswer() -> Bool
     let answer = readLine()
     if let unwrappedAnswer = answer
     {
-        //FIXME: if you insert a 4-letter sequence of letters it doesnt stop, wooooops
-        //FIXME: don't let the player type a character more than once
-        let arrayAnswer =  Array(unwrappedAnswer)
-        let arrayPossibleCharacters = Array(possibleCharactersString)
-        let setAnswer = Set(arrayAnswer)
-        let setPossibleCharacters = Set(arrayPossibleCharacters)
-        let commonCharacters = setAnswer.intersection(setPossibleCharacters).count
+        let setAnswer = Set(unwrappedAnswer)
+        let commonCharacters = setAnswer.intersection(possibleCharacters).count
         if unwrappedAnswer.count == 4 && commonCharacters == 4
         {
             tries+=1
