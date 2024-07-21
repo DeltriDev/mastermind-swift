@@ -1,7 +1,8 @@
 //necessary variables
 var tries = 0
 let possibleCharacters:Set<String.Element> = ["1","2","3","4","5","6","7","8"]
-var correctAnswer:String = GenerateCorrectAnswer()
+var difficulty:Int = ChooseDifficulty()
+var correctAnswer:String = GenerateCorrectAnswer(difficulty)
 
 //run the game
 GameLoop()
@@ -12,17 +13,17 @@ func GameLoop()
     repeat
     {
         print("Try \(tries+1)")
-        if AwaitAnswer()
+        if TryAnswer()
         {
             print("You broke the code! Congratulations!") //add how many tries it took
             readLine()
-            break
+            exit(0)
         }
         else if tries == 12
         {
             print("You lost...")
             readLine()
-            break
+            exit(0)
         }
     }while tries<12
 }
@@ -33,11 +34,12 @@ func GameIntro()
     print("Welcome to the code-breaking game MasterMind, written in Swift!")
     print("Try to guess the number sequence of numbers from 1-8!")
     print("Every number can be used once")
+    print("If you want at any point of the game to close it, you can type `exit`")
     print("You have 12 tries")
 }
 
-//returns a 4 letter string made with elements from possibleCharacters
-func GenerateCorrectAnswer() -> String
+//returns a string made with elements from possibleCharacters
+func GenerateCorrectAnswer(_ letters:Int) -> String
 {
     var correctAnswer = ""
     repeat
@@ -47,24 +49,29 @@ func GenerateCorrectAnswer() -> String
         {
             correctAnswer += String(charToAdd)
         }
-    }while correctAnswer.count < 4
+    }while correctAnswer.count < letters
     return correctAnswer
 }
 
 //asks for an answer and returns true if its correct
-func AwaitAnswer() -> Bool
+func TryAnswer() -> Bool
 {
-    print("Now write a 4-digit sequence of numbers 1-8")
+    print("Now write a \(difficulty)-digit sequence of numbers 1-8")
     let answer = readLine()
+    //little line allowing the user to exit at will
+    if answer == "exit"
+    {
+        exit(0)
+    }
     if let unwrappedAnswer = answer
     {
         let setAnswer = Set(unwrappedAnswer)
         let commonCharacters = setAnswer.intersection(possibleCharacters).count
-        if unwrappedAnswer.count == 4 && commonCharacters == 4
+        if unwrappedAnswer.count == difficulty && commonCharacters == difficulty
         {
             tries+=1
             let result = CompareStrings(unwrappedAnswer, correctAnswer)
-            if result.exactMatches == 4
+            if result.exactMatches == difficulty
             {
                 return true
             }
@@ -92,7 +99,7 @@ func CompareStrings(_ str1: String, _ str2: String) -> (exactMatches: Int, nonEx
     let arr2 = Array(str2)
 
     // Check for exact matches
-    for i in 0..<4 {
+    for i in 0..<arr1.count {
         if arr1[i] == arr2[i] {
             exactMatches += 1
         }
@@ -106,7 +113,7 @@ func CompareStrings(_ str1: String, _ str2: String) -> (exactMatches: Int, nonEx
         var inStr1ButNotExact = false
         var inStr2ButNotExact = false
         
-        for i in 0..<4 {
+        for i in 0..<arr1.count {
             if arr1[i] == char && arr2[i] != char {
                 inStr1ButNotExact = true
             }
@@ -121,4 +128,20 @@ func CompareStrings(_ str1: String, _ str2: String) -> (exactMatches: Int, nonEx
     }
     
     return (exactMatches, nonExactMatches)
- }
+}
+
+func ChooseDifficulty() -> Int
+{
+    print("Choose your difficulty from 3 to 5 (4 is normal)")
+    let difficultyText = readLine()
+    let differentNums:[String] = ["3", "4", "5"]
+    if let unwrappedText = difficultyText
+    {
+        if unwrappedText.count == 1 && differentNums.contains(unwrappedText)
+        {
+            return Int(unwrappedText) ?? 4
+        }
+    }
+    //Will just rerun this until the user gives correct input
+    return ChooseDifficulty()
+}
